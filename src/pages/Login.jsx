@@ -1,3 +1,4 @@
+import { authApi } from "api";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
@@ -11,21 +12,41 @@ function Login() {
   const [password, setPassword] = useState("");
   const [nickname, setNickname] = useState("");
 
-  const onSubmitHandler = (event) => {
+  const onSubmitHandler = async (event) => {
     event.preventDefault();
     if (isLoginForm) {
       // 로그인 처리
-      dispatch(login());
-      toast.success("로그인 성공");
-      // alert("로그인성공");
+      try {
+        const { data } = await authApi.post("/login", {
+          id: userId,
+          password,
+        });
+        if (data.success) {
+          dispatch(login(data.accessToken));
+          toast.success("로그인 성공");
+        }
+      } catch (error) {
+        toast.error(error.response.data.message);
+      }
     } else {
       // 회원가입 처리
-      setIsLoginForm(true);
-      setUserId("");
-      setPassword("");
-      setNickname("");
-      toast.success("회원가입 성공");
-      // alert("회원가입성공");
+      try {
+        const { data } = await authApi.post("/register", {
+          id: userId,
+          password,
+          nickname,
+        });
+        if (data.success) {
+          setIsLoginForm(true);
+          setUserId("");
+          setPassword("");
+          setNickname("");
+          toast.success("회원가입 성공");
+        }
+      } catch (error) {
+        toast.error(error.response.data.message);
+        // console.log("error : ", error);
+      }
     }
   };
 
