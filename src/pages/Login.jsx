@@ -21,8 +21,9 @@ function Login() {
           id: userId,
           password,
         });
+        // const { accessToken, avatar, nickname, userId } = data;
         if (data.success) {
-          dispatch(login(data.accessToken));
+          dispatch(login(data));
           toast.success("로그인 성공");
         }
       } catch (error) {
@@ -36,6 +37,7 @@ function Login() {
           password,
           nickname,
         });
+
         if (data.success) {
           setIsLoginForm(true);
           setUserId("");
