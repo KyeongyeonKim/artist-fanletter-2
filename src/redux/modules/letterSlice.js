@@ -3,10 +3,36 @@ import { jsonApi } from "api";
 
 const initialState = {
   letters: [],
-  isLoading: false,
+  isLoading: true,
   isError: false,
   error: null,
 };
+
+export const __editLetter = createAsyncThunk(
+  "editLetter",
+  async ({ id, editingText }, thunkAPI) => {
+    try {
+      await jsonApi.patch(`/letters/${id}`, { content: editingText });
+      const { data } = await jsonApi.get("/letters");
+      return data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err);
+    }
+  }
+);
+
+export const __deleteLetter = createAsyncThunk(
+  "deleteLetter",
+  async (id, thunkAPI) => {
+    try {
+      await jsonApi.delete(`/letters/${id}`);
+      const { data } = await jsonApi.get("/letters");
+      return data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err);
+    }
+  }
+);
 
 export const __getLetters = createAsyncThunk(
   "getLetters",
@@ -37,26 +63,7 @@ export const __addLetter = createAsyncThunk(
 const lettersSlice = createSlice({
   name: "letters",
   initialState,
-  reducers: {
-    addLetter: (state, action) => {
-      const newLetter = action.payload;
-      return [newLetter, ...state];
-    },
-    deleteLetter: (state, action) => {
-      const letterId = action.payload;
-      return state.filter((letter) => letter.id !== letterId);
-    },
-    editLetter: (state, action) => {
-      const { id, editingText } = action.payload;
-      return state.map((letter) => {
-        if (letter.id === id) {
-          return { ...letter, content: editingText };
-        }
-        return letter;
-      });
-    },
-  },
-
+  reducers: {},
   extraReducers: (builder) => {
     builder.addCase(__addLetter.pending, (state, action) => {
       state.isLoading = true;
@@ -87,8 +94,38 @@ const lettersSlice = createSlice({
       state.isError = true;
       state.error = action.payload;
     });
+
+    builder.addCase(__deleteLetter.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(__deleteLetter.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.letters = action.payload;
+      state.isError = false;
+      state.error = null;
+    });
+    builder.addCase(__deleteLetter.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.error = action.payload;
+    });
+
+    builder.addCase(__editLetter.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(__editLetter.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.letters = action.payload;
+      state.isError = false;
+      state.error = null;
+    });
+    builder.addCase(__editLetter.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.error = action.payload;
+    });
   },
 });
 
-export const { addLetter, deleteLetter, editLetter } = lettersSlice.actions;
+// export const { addLetter, deleteLetter, editLetter } = lettersSlice.actions;
 export default lettersSlice.reducer;
