@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import { jsonApi } from "api";
 
 const initialState = {
   letters: [],
@@ -12,7 +12,7 @@ export const __getLetters = createAsyncThunk(
   "getLetters",
   async (payload, thunkAPI) => {
     try {
-      const { data } = await axios.get("http://localhost:5000/letters");
+      const { data } = await jsonApi.get("/letters");
       return data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err);
@@ -24,8 +24,8 @@ export const __addLetter = createAsyncThunk(
   "addLetter",
   async (newLetter, thunkAPI) => {
     try {
-      await axios.post("http://localhost:5000/letters", newLetter);
-      const { data } = await axios.get("http://localhost:5000/letters");
+      await jsonApi.post("/letters", newLetter);
+      const { data } = await jsonApi.get("/letters");
       console.log("data : ", data);
       return data;
     } catch (error) {

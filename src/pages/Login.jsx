@@ -2,7 +2,7 @@ import { authApi } from "api";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
-import { login } from "redux/modules/authSlice";
+import { __login } from "redux/modules/authSlice";
 import styled from "styled-components";
 
 function Login() {
@@ -15,20 +15,21 @@ function Login() {
   const onSubmitHandler = async (event) => {
     event.preventDefault();
     if (isLoginForm) {
+      dispatch(__login({ userId, password }));
       // 로그인 처리
-      try {
-        const { data } = await authApi.post("/login", {
-          id: userId,
-          password,
-        });
-        // const { accessToken, avatar, nickname, userId } = data;
-        if (data.success) {
-          dispatch(login(data));
-          toast.success("로그인 성공");
-        }
-      } catch (error) {
-        toast.error(error.response.data.message);
-      }
+      // try {
+      //   const { data } = await authApi.post("/login?expiresIn=10s", {
+      //     id: userId,
+      //     password,
+      //   });
+      //   // const { accessToken, avatar, nickname, userId } = data;
+      //   if (data.success) {
+      //     dispatch(login(data));
+      //     toast.success("로그인 성공");
+      //   }
+      // } catch (error) {
+      //   toast.error(error.response.data.message);
+      // }
     } else {
       // 회원가입 처리
       try {
